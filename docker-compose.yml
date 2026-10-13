@@ -10,59 +10,10 @@
 services:
 
 
-  iar-batch-dump:
-    image: abesesr/iar:${IAR_BATCH_DUMP_VERSION}
-    container_name: iar-batch-dump
-    restart: unless-stopped
-    mem_limit: ${MEM_LIMIT}
-    memswap_limit: ${MEM_LIMIT}
-    cpus: ${CPU_LIMIT}
-    environment:   
-      SPRING_PROFILES_ACTIVE: ${IAR_BATCH_SPRING_PROFILES_ACTIVE}
-      JAVA_TOOL_OPTIONS: ${IAR_BATCH_JAVA_TOOL_OPTIONS}
-      IAR_BATCH_AT_STARTUP: ${IAR_BATCH_AT_STARTUP}
 
-      IAR_BATCH_OUTPUT_DIR: ${IAR_BATCH_OUTPUT_DIR}
-      IAR_BATCH_OUTPUT_FILENAME: ${IAR_BATCH_OUTPU_FILENAME}
-      IAR_BATCH_VECTORIZATION_URL: ${IAR_BATCH_VECTORIZATION_URL}
-      IAR_BATCH_CHUNK_SIZE: ${IAR_BATCH_CHUNK_SIZE}
-      IAR_BATCH_SOURCE_TABLE: ${IAR_BATCH_SOURCE_TABLE}
-
-      IAR_ORACLE_HOST: ${IAR_ORACLE_HOST}
-      IAR_ORACLE_PORT: ${IAR_ORACLE_PORT}
-      IAR_ORACLE_SERVICE: ${IAR_ORACLE_SERVICE}
-      IAR_ORACLE_USER: ${IAR_ORACLE_USER}
-      IAR_ORACLE_PASSWORD: ${IAR_ORACLE_PASSWORD}
-
-      IAR_BATCH_TEST_OUTPUT_DIR: ${IAR_BATCH_TEST_OUTPUT_DIR}
-      IAR_BATCH_TEST_PROCEDURE_FILENAME: ${IAR_BATCH_TEST_OUTPUT_FILENAME}
-      IAR_BATCH_TEST_REQUETE_FILENAME: ${IAR_BATCH_TEST_REQUETE_FILENAME}
-      IAR_BATCH_TEST_SOURCE_TABLE: ${IAR_BATCH_TEST_SOURCE_TABLE}
-      IAR_BATCH_TEST_CHUNK_SIZE: ${IAR_BATCH_TEST_CHUNK_SIZE}
-
-      IAR_TEST_ORACLE_HOST: ${IAR_TEST_ORACLE_HOST}
-      IAR_TEST_ORACLE_PORT: ${IAR_TEST_ORACLE_PORT}
-      IAR_TEST_ORACLE_SERVICE: ${IAR_TEST_ORACLE_SERVICE}
-      IAR_TEST_ORACLE_USER: ${IAR_TEST_ORACLE_USER}
-      IAR_TEST_ORACLE_PASSWORD: ${IAR_TEST_ORACLE_PASSWORD}
-    volumes: 
-      - ./volumes:/app/data
-    networks :
-      -  ${IAR_DOCKER_NETWORK}     
-    labels:
-      # pour envoyer les logs dans le puits de log de l'abes
-      - "co.elastic.logs/enabled=true"
-      - "co.elastic.logs/processors.add_fields.target="
-      - "co.elastic.logs/processors.add_fields.fields.abes_appli=iar"
-      - "co.elastic.logs/processors.add_fields.fields.abes_middleware=java-spring"
-      # pour que les mises à jour de cette image soient auto-déployées par wud
-      - "wud.watch=true"
-      - "wud.watch.digest=true"
-
-
-  iar-vectorisation:
-    image: abesesr/iar:${IAR_VECTORISATION_VERSION}
-    container_name: iar-vectorisation
+  indexation-sujet-vectorisation:
+    image: abesesr/indexation-sujet:${INDEXATION_SUJET_VECTORISATION_VERSION}
+    container_name: indexation-sujet-vectorisation
     restart: unless-stopped
     mem_limit: ${MEM_LIMIT}
     memswap_limit: ${MEM_LIMIT}
@@ -76,70 +27,70 @@ services:
               capabilities: [gpu]
     environment:
      # TODO verif llm necessaire ou non pour  la vectorisation 
-      IAR_QDRANT_HOST: ${IAR_QDRANT_HOST}
-      IAR_QDRANT_PORT: ${IAR_QDRANT_PORT}
-      IAR_QDRANT_MIN_VECTORS: ${IAR_QDRANT_MIN_VECTORS}
-      IAR_QDRANT_TEST_LIMIT: ${IAR_QDRANT_TEST_LIMIT}
+      INDEXATION_SUJET_QDRANT_HOST: ${INDEXATION_SUJET_QDRANT_HOST}
+      INDEXATION_SUJET_QDRANT_PORT: ${INDEXATION_SUJET_QDRANT_PORT}
+      INDEXATION_SUJET_QDRANT_MIN_VECTORS: ${INDEXATION_SUJET_QDRANT_MIN_VECTORS}
+      INDEXATION_SUJET_QDRANT_TEST_LIMIT: ${INDEXATION_SUJET_QDRANT_TEST_LIMIT}
 
-      IAR_DOCKER_VOLUME_BIND: ${IAR_DOCKER_VOLUME_BIND} 
+      INDEXATION_SUJET_DOCKER_VOLUME_BIND: ${INDEXATION_SUJET_DOCKER_VOLUME_BIND} 
 
-      IAR_VECTORIZE_CONCEPTS_OR_CHAINS: ${IAR_VECTORIZE_CONCEPTS_OR_CHAINS}      
-      IAR_VECTORIZE_AVEC_THESE: ${IAR_VECTORIZE_AVEC_THESE} 
+      INDEXATION_SUJET_VECTORIZE_CONCEPTS_OR_CHAINS: ${INDEXATION_SUJET_VECTORIZE_CONCEPTS_OR_CHAINS}      
+      INDEXATION_SUJET_VECTORIZE_AVEC_THESE: ${INDEXATION_SUJET_VECTORIZE_AVEC_THESE} 
 
-      IAR_VECTORISATION_HOST: ${IAR_VECTORISATION_HOST}
-      IAR_VECTORISATION_PORT: ${IAR_VECTORISATION_PORT}
-      IAR_DOCKER_NETWORK: ${IAR_DOCKER_NETWORK}
-      IAR_DOCKER_IMAGE_BATCH: ${IAR_DOCKER_IMAGE_BATCH}
-      IAR_DOCKER_SOCK: ${IAR_DOCKER_SOCK}
-      IAR_DOCKER_BATCH_USER : ${IAR_DOCKER_BATCH_USER}
+      INDEXATION_SUJET_VECTORISATION_HOST: ${INDEXATION_SUJET_VECTORISATION_HOST}
+      INDEXATION_SUJET_VECTORISATION_PORT: ${INDEXATION_SUJET_VECTORISATION_PORT}
+      INDEXATION_SUJET_DOCKER_NETWORK: ${INDEXATION_SUJET_DOCKER_NETWORK}
+      INDEXATION_SUJET_DOCKER_IMAGE_BATCH: ${INDEXATION_SUJET_DOCKER_IMAGE_BATCH}
+      INDEXATION_SUJET_DOCKER_SOCK: ${INDEXATION_SUJET_DOCKER_SOCK}
+      INDEXATION_SUJET_DOCKER_BATCH_USER : ${INDEXATION_SUJET_DOCKER_BATCH_USER}
       
       ENABLE_GPU: ${ENABLE_GPU}
     depends_on:
-      - iar-qdrant
+      - indexation-sujet-qdrant
     user: root
     ports:
-      - ${IAR_VECTORISATION_PORT}:${IAR_VECTORISATION_PORT}
+      - ${INDEXATION_SUJET_VECTORISATION_PORT}:${INDEXATION_SUJET_VECTORISATION_PORT}
     volumes: 
       - ./volumes:/app/data
       - /var/run/docker.sock:/var/run/docker.sock
     networks :
-      -  ${IAR_DOCKER_NETWORK}
+      -  ${INDEXATION_SUJET_DOCKER_NETWORK}
     labels:
       # pour envoyer les logs dans le puits de log de l'abes
       - "co.elastic.logs/enabled=true"
       - "co.elastic.logs/processors.add_fields.target="
-      - "co.elastic.logs/processors.add_fields.fields.abes_appli=iar"
+      - "co.elastic.logs/processors.add_fields.fields.abes_appli=indexation-sujet"
       - "co.elastic.logs/processors.add_fields.fields.abes_middleware=fastapi"
       # pour que les mises à jour de cette image soient auto-déployées par wud
       - "wud.watch=true"
       - "wud.watch.digest=true"
 
-  iar-qdrant:
+  indexation-sujet-qdrant:
     image: qdrant/qdrant:latest
     restart: unless-stopped
-    container_name: iar-qdrant
+    container_name: indexation-sujet-qdrant
     ports:
-      - ${IAR_QDRANT_PORT}:6333  
+      - ${INDEXATION_SUJET_QDRANT_PORT}:6333  
     configs:
       - source: qdrant_config
         target: /qdrant/config/production.yaml
     volumes:
       - ./volumes/qdrant/storage:/qdrant/storage
     networks :
-      -  ${IAR_DOCKER_NETWORK}
-  iar-llm:
+      -  ${INDEXATION_SUJET_DOCKER_NETWORK}
+  indexation-sujet-llm:
     image: ollama/ollama:latest
-    container_name: iar-llm
+    container_name: indexation-sujet-llm
     restart: unless-stopped
     mem_limit: ${MEM_LIMIT}
     memswap_limit: ${MEM_LIMIT}
     cpus: ${CPU_LIMIT}
     ports:
-      - ${IAR_LLM_PORT}:11434
+      - ${INDEXATION_SUJET_LLM_PORT}:11434
     volumes:
       - ./volumes/ollama:/root/.ollama
     networks:
-      -  ${IAR_DOCKER_NETWORK}
+      -  ${INDEXATION_SUJET_DOCKER_NETWORK}
     deploy:
       resources:
         reservations:
@@ -148,29 +99,29 @@ services:
               count: all
               capabilities: [gpu]
 
-  iar-api:
-    image: abesesr/iar:${IAR_API_VERSION}
-    container_name: iar-api
+  indexation-sujet-api:
+    image: abesesr/indexation-sujet:${INDEXATION_SUJET_API_VERSION}
+    container_name: indexation-sujet-api
     restart: unless-stopped
     mem_limit: ${MEM_LIMIT}
     memswap_limit: ${MEM_LIMIT}
     cpus: ${CPU_LIMIT}
     environment:
-      IAR_API_LLM_URL : ${IAR_LLM_URL}
-      IAR_API_LLM_KEY: ${IAR_LLM_KEY}
-      IAR_API_LLM_MODEL: ${IAR_LLM_MODEL}
-      IAR_QDRANT_HOST: ${IAR_QDRANT_HOST}
-      IAR_QDRANT_PORT: ${IAR_QDRANT_PORT}
-      IAR_API_HTTP_HOST: ${IAR_API_HTTP_HOST}
-      IAR_API_HTTP_PORT: ${IAR_API_HTTP_PORT}
-      IAR_CORS_ORIGINS: ${IAR_CORS_ORIGINS}
+      INDEXATION_SUJET_API_LLM_URL : ${INDEXATION_SUJET_LLM_URL}
+      INDEXATION_SUJET_API_LLM_KEY: ${INDEXATION_SUJET_LLM_KEY}
+      INDEXATION_SUJET_API_LLM_MODEL: ${INDEXATION_SUJET_LLM_MODEL}
+      INDEXATION_SUJET_QDRANT_HOST: ${INDEXATION_SUJET_QDRANT_HOST}
+      INDEXATION_SUJET_QDRANT_PORT: ${INDEXATION_SUJET_QDRANT_PORT}
+      INDEXATION_SUJET_API_HTTP_HOST: ${INDEXATION_SUJET_API_HTTP_HOST}
+      INDEXATION_SUJET_API_HTTP_PORT: ${INDEXATION_SUJET_API_HTTP_PORT}
+      INDEXATION_SUJET_CORS_ORIGINS: ${INDEXATION_SUJET_CORS_ORIGINS}
     ports:
-      - ${IAR_API_HTTP_PORT}:${IAR_API_HTTP_PORT}
+      - ${INDEXATION_SUJET_API_HTTP_PORT}:${INDEXATION_SUJET_API_HTTP_PORT}
     volumes:
       - ./volumes:/app/data:z
     depends_on:
-      - iar-llm
-      - iar-qdrant
+      - indexation-sujet-llm
+      - indexation-sujet-qdrant
     deploy:
       resources:
         reservations:
@@ -179,12 +130,12 @@ services:
               count: all
               capabilities: [gpu]
     networks :
-      -  ${IAR_DOCKER_NETWORK}
+      -  ${INDEXATION_SUJET_DOCKER_NETWORK}
     labels:
       # pour envoyer les logs dans le puits de log de l'abes
       - "co.elastic.logs/enabled=true"
       - "co.elastic.logs/processors.add_fields.target="
-      - "co.elastic.logs/processors.add_fields.fields.abes_appli=iar"
+      - "co.elastic.logs/processors.add_fields.fields.abes_appli=indexation-sujet"
       - "co.elastic.logs/processors.add_fields.fields.abes_middleware=fastapi"
       # pour que les mises à jour de cette image soient auto-déployées par wud
       - "wud.watch=true"
@@ -196,8 +147,8 @@ configs:
       log_level: INFO
 
 networks : 
-  iar-network :
-    name : ${IAR_DOCKER_NETWORK}
+  indexation-sujet-network :
+    name : ${INDEXATION_SUJET_DOCKER_NETWORK}
     external : true
 
 
