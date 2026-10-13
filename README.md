@@ -39,7 +39,7 @@ La plateforme INDEXATION_SUJET est découpée en plusieurs modules complémentai
 | [**indexation-sujet-api**](https://github.com/abes-esr/indexation-sujet-api)                     | Service web d'inférence FastAPI exposant les endpoints de suggestion d'indexation sujet RAMEAU.                                     |
 | [**indexation-sujet-vectorisation**](https://github.com/abes-esr/indexation-sujet-vectorisation) | Pipeline de calcul vectoriel (embeddings Sentence-Transformers) et peuplement des collections Qdrant.                               |
 | [**indexation-sujet-batch-docker**](https://github.com/abes-esr/indexation-sujet-batch-docker)   | Environnement Docker d'orchestration pour l'exécution des traitements par lots et interfaces de mise à jour.                        |
-| [**indexation-sujet-batch-dump**](https://github.com/abes-esr/indexation-sujet-batch-dump)       | Extraction, transformation et génération des dumps de données d'autorités RAMEAU et notices bibliographiques Sudoc.                 |
+| [**indexation-sujet-batch**](https://github.com/abes-esr/indexation-sujet-batch)                 | Extraction, transformation et génération des dumps de données d'autorités RAMEAU et notices bibliographiques Sudoc.                 |
 | [**indexation-sujet-script-winibw**](https://github.com/abes-esr/indexation-sujet-script-winibw) | Script client (VBScript) s'intégrant au logiciel de catalogage **WinIBW** pour interroger l'API depuis le poste des catalogueurs.   |
 
 ---
@@ -106,7 +106,7 @@ La configuration est centralisée dans le fichier [`.env`](./.env), créé à pa
 │                                CLIENTS, BATCHS & SUPERVISION                                     │
 │                                                                                                  │
 │  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────────────┐  ┌─────────────────────┐  │
-│  │ Client WinIBW    │  │ Navigateur Web   │  │ indexation-sujet-batch-dump        │  │ Supervision ABES    │  │
+│  │ Client WinIBW    │  │ Navigateur Web   │  │ indexation-sujet-batch        │  │ Supervision ABES    │  │
 │  │(Catalogage Sudoc)│  │(Catalogueur/Adm.)│  │ (diplotaxis*.abes.fr) │  │(diplotaxis7-*.abes) │  │
 │  └────────┬─────────┘  └────────┬─────────┘  └───────────┬───────────┘  └──────────▲──────────┘  │
 └───────────┼─────────────────────┼────────────────────────┼─────────────────────────┼─────────────┘
