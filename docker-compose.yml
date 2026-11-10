@@ -46,8 +46,6 @@ services:
       - ${INDEXATION_SUJET_VECTORISATION_PORT}:${INDEXATION_SUJET_VECTORISATION_PORT}
     volumes: 
       - ./volumes:/app/data
-    networks :
-      -  ${INDEXATION_SUJET_DOCKER_NETWORK}
     labels:
       # pour envoyer les logs dans le puits de log de l'abes
       - "co.elastic.logs/enabled=true"
@@ -69,8 +67,6 @@ services:
         target: /qdrant/config/production.yaml
     volumes:
       - ./volumes/qdrant/storage:/qdrant/storage
-    networks :
-      -  ${INDEXATION_SUJET_DOCKER_NETWORK}
   indexation-sujet-llm:
     image: ollama/ollama:latest
     container_name: indexation-sujet-llm
@@ -82,8 +78,6 @@ services:
       - ${INDEXATION_SUJET_LLM_PORT}:11434
     volumes:
       - ./volumes/ollama:/root/.ollama
-    networks:
-      -  ${INDEXATION_SUJET_DOCKER_NETWORK}
     deploy:
       resources:
         reservations:
@@ -122,8 +116,6 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
-    networks :
-      -  ${INDEXATION_SUJET_DOCKER_NETWORK}
     labels:
       # pour envoyer les logs dans le puits de log de l'abes
       - "co.elastic.logs/enabled=true"
@@ -139,10 +131,6 @@ configs:
     content: |
       log_level: INFO
 
-networks : 
-  indexation-sujet-network :
-    name : ${INDEXATION_SUJET_DOCKER_NETWORK}
-    external : true
 
 
       
