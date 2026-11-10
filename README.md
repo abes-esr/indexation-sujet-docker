@@ -57,14 +57,14 @@ La plateforme INDEXATION_SUJET est découpée en plusieurs modules complémentai
 
 ### Réseau interne Docker (Bridge)
 
-Les conteneurs communiquent à travers un réseau bridge dédié `${INDEXATION_SUJET_DOCKER_NETWORK}` (par défaut `indexation-sujet-network`) :
+Les conteneurs communiquent à travers le réseau bridge créé automatiquement par Docker Compose pour la pile (`indexation-sujet-docker_default`), sans création manuelle :
 
 - **Résolution DNS automatique** : Les conteneurs s'appellent par leur nom de service (ex. `http://indexation-sujet-qdrant:6333` ou `http://indexation-sujet-llm:11434`).
 - **Isolation sécurisée** : Les échanges internes d'inférence (FastAPI ↔ Qdrant et FastAPI ↔ Ollama) transitent de manière étanche au sein du réseau Docker bridge.
 
 ### Volumes persistants montés sur l'hôte
 
-Tous les volumes applicatifs sont rattachés au répertoire local `./volumes` (ou chemin spécifié par `INDEXATION_SUJET_DOCKER_VOLUME_BIND`), monté dans `/app/data` :
+Tous les volumes applicatifs sont rattachés au répertoire local `./volumes`, monté dans `/app/data` :
 
 - [`./volumes/csv/`](./volumes/csv/) : Référentiels d'autorités RAMEAU sous forme tabulaire (`rameau_ancestors_df.csv`, `rameau_parents.csv`, `rameau_subdivisionsONLY.csv`).
 - [`./volumes/pkl/`](./volumes/pkl/) : Caches sérialisés Python (fichiers `.pkl`) contenant les graphes, hiérarchies et dictionnaires RAMEAU précalculés.
@@ -92,8 +92,6 @@ La configuration est centralisée dans le fichier [`.env`](./.env), créé à pa
 | **`INDEXATION_SUJET_VECTORISATION_PORT`**    | Port d'écoute hôte exposé pour le service de vectorisation                            | `8100`                                       |
 | **`INDEXATION_SUJET_QDRANT_PORT`**           | Port d'écoute hôte exposé pour la base Qdrant                                         | `6333`                                       |
 | **`INDEXATION_SUJET_LLM_PORT`**              | Port d'écoute hôte exposé pour le serveur LLM                                         | `11434`                                      |
-| **`INDEXATION_SUJET_DOCKER_NETWORK`**        | Nom du réseau Docker externe bridge reliant les conteneurs                            | `indexation-sujet-network`                   |
-| **`INDEXATION_SUJET_DOCKER_VOLUME_BIND`**    | Chemin racine des volumes montés sur l'hôte                                           | `./volumes`                                  |
 
 > ⚠️ **Sécurité** : Le fichier `.env` contient des configurations spécifiques à la machine et des clés sensibles. Il ne doit **jamais être commité** sur GitHub et est ignoré par le [`.gitignore`](./.gitignore).
 
@@ -120,7 +118,7 @@ La configuration est centralisée dans le fichier [`.env`](./.env), créé à pa
 │  PORTS COMPOSE EXPOSÉS :  :8071 (API)   :6333 (Qdrant)   │    :11434 (LLM)   :8100 (Vect.)       │
 │  ────────────────────────────────────────────────────────┼────────────────────────────────────   │
 │                                                          │                                       │
-│  PILE DOCKER COMPOSE indexation-sujet-docker (Réseau bridge : indexation-sujet-network)                                    │
+│  PILE DOCKER COMPOSE indexation-sujet-docker (Réseau bridge : défaut de la pile Compose)                                │
 │                                                          │                                       │
 │  ┌───────────────────────┐             ┌─────────────────┼──────┐                                │
 │  │       indexation-sujet-api         │◄────gRPC────┤       indexation-sujet-qdrant│      │                                │
@@ -178,16 +176,12 @@ La configuration est centralisée dans le fichier [`.env`](./.env), créé à pa
    git clone https://github.com/abes-esr/indexation-sujet-docker.git
    cd /opt/pod/indexation-sujet-docker/
    ```
-3. **Création du réseau Docker** s'il n'existe pas déjà :
-   ```bash
-   docker network create indexation-sujet-network 2>/dev/null || true
-   ```
-4. **Initialisation de la configuration** :
+3. **Initialisation de la configuration** :
    ```bash
    cp .env-dist .env
    # Éditer .env pour adapter les tags d'images et allouer les ressources matérielles
    ```
-5. **Lancement de la plateforme** :
+4. **Lancement de la plateforme** :
    ```bash
    docker compose up -d
    ```
@@ -321,9 +315,6 @@ ls -lh /opt/pod/indexation-sujet-docker/volumes/csv/rameau_ancestors_df.csv \
 
 ```bash
 cd /opt/pod/indexation-sujet-docker
-
-# Créer le réseau Docker externe indexation-sujet-network (|| true s'il existe déjà)
-docker network create indexation-sujet-network || true
 
 # Démarrer la pile et vérifier l'état
 docker compose up -d

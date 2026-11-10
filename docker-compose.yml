@@ -32,29 +32,20 @@ services:
       INDEXATION_SUJET_QDRANT_MIN_VECTORS: ${INDEXATION_SUJET_QDRANT_MIN_VECTORS}
       INDEXATION_SUJET_QDRANT_TEST_LIMIT: ${INDEXATION_SUJET_QDRANT_TEST_LIMIT}
 
-      INDEXATION_SUJET_DOCKER_VOLUME_BIND: ${INDEXATION_SUJET_DOCKER_VOLUME_BIND} 
-
       INDEXATION_SUJET_VECTORIZE_CONCEPTS_OR_CHAINS: ${INDEXATION_SUJET_VECTORIZE_CONCEPTS_OR_CHAINS}      
-      INDEXATION_SUJET_VECTORIZE_AVEC_THESE: ${INDEXATION_SUJET_VECTORIZE_AVEC_THESE} 
+      INDEXATION_SUJET_VECTORIZE_LANGS: ${INDEXATION_SUJET_VECTORIZE_LANGS}
+      INDEXATION_SUJET_VECTORIZE_AVEC_THESE: ${INDEXATION_SUJET_VECTORIZE_AVEC_THESE}
+      INDEXATION_SUJET_VECTORIZE_MAX_PARALLEL: ${INDEXATION_SUJET_VECTORIZE_MAX_PARALLEL:-2}
+      INDEXATION_SUJET_VECTORIZE_THREADS_PER_JOB: ${INDEXATION_SUJET_VECTORIZE_THREADS_PER_JOB:-0}
 
       INDEXATION_SUJET_VECTORISATION_HOST: ${INDEXATION_SUJET_VECTORISATION_HOST}
       INDEXATION_SUJET_VECTORISATION_PORT: ${INDEXATION_SUJET_VECTORISATION_PORT}
-      INDEXATION_SUJET_DOCKER_NETWORK: ${INDEXATION_SUJET_DOCKER_NETWORK}
-      INDEXATION_SUJET_DOCKER_IMAGE_BATCH: ${INDEXATION_SUJET_DOCKER_IMAGE_BATCH}
-      INDEXATION_SUJET_DOCKER_SOCK: ${INDEXATION_SUJET_DOCKER_SOCK}
-      INDEXATION_SUJET_DOCKER_BATCH_USER : ${INDEXATION_SUJET_DOCKER_BATCH_USER}
-      
-      ENABLE_GPU: ${ENABLE_GPU}
     depends_on:
       - indexation-sujet-qdrant
-    user: root
     ports:
       - ${INDEXATION_SUJET_VECTORISATION_PORT}:${INDEXATION_SUJET_VECTORISATION_PORT}
     volumes: 
       - ./volumes:/app/data
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks :
-      -  ${INDEXATION_SUJET_DOCKER_NETWORK}
     labels:
       # pour envoyer les logs dans le puits de log de l'abes
       - "co.elastic.logs/enabled=true"
@@ -76,8 +67,6 @@ services:
         target: /qdrant/config/production.yaml
     volumes:
       - ./volumes/qdrant/storage:/qdrant/storage
-    networks :
-      -  ${INDEXATION_SUJET_DOCKER_NETWORK}
   indexation-sujet-llm:
     image: ollama/ollama:latest
     container_name: indexation-sujet-llm
@@ -89,8 +78,6 @@ services:
       - ${INDEXATION_SUJET_LLM_PORT}:11434
     volumes:
       - ./volumes/ollama:/root/.ollama
-    networks:
-      -  ${INDEXATION_SUJET_DOCKER_NETWORK}
     deploy:
       resources:
         reservations:
@@ -129,8 +116,6 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
-    networks :
-      -  ${INDEXATION_SUJET_DOCKER_NETWORK}
     labels:
       # pour envoyer les logs dans le puits de log de l'abes
       - "co.elastic.logs/enabled=true"
@@ -146,10 +131,6 @@ configs:
     content: |
       log_level: INFO
 
-networks : 
-  indexation-sujet-network :
-    name : ${INDEXATION_SUJET_DOCKER_NETWORK}
-    external : true
 
 
       
