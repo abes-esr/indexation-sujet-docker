@@ -46,6 +46,9 @@ services:
       - ${INDEXATION_SUJET_VECTORISATION_PORT}:${INDEXATION_SUJET_VECTORISATION_PORT}
     volumes: 
       - ./volumes:/app/data
+    networks:
+      - default
+      - intern
     labels:
       # pour envoyer les logs dans le puits de log de l'abes
       - "co.elastic.logs/enabled=true"
@@ -67,6 +70,8 @@ services:
         target: /qdrant/config/production.yaml
     volumes:
       - ./volumes/qdrant/storage:/qdrant/storage
+    networks:
+      - intern
   indexation-sujet-llm:
     image: ollama/ollama:latest
     container_name: indexation-sujet-llm
@@ -78,6 +83,8 @@ services:
       - ${INDEXATION_SUJET_LLM_PORT}:11434
     volumes:
       - ./volumes/ollama:/root/.ollama
+    networks:
+      - intern
     deploy:
       resources:
         reservations:
@@ -106,6 +113,9 @@ services:
       - ${INDEXATION_SUJET_API_HTTP_PORT}:${INDEXATION_SUJET_API_HTTP_PORT}
     volumes:
       - ./volumes:/app/data:z
+    networks:
+      - default
+      - intern
     depends_on:
       - indexation-sujet-llm
       - indexation-sujet-qdrant
@@ -131,6 +141,12 @@ configs:
     content: |
       log_level: INFO
 
+networks:
+  default:
+    driver: bridge
+
+  intern:
+    internal: true
 
 
       
