@@ -89,6 +89,7 @@ La configuration est centralisée dans le fichier [`.env`](./.env), créé à pa
 | **`INDEXATION_SUJET_VECTORISATION_VERSION`** | Tag Docker Hub de l'image `abesesr/indexation-sujet` pour le service de vectorisation | `test-vectorisation` ou `prod-vectorisation` |
 | **`INDEXATION_SUJET_QDRANT_VERSION`**        | Version de l'image officielle Qdrant                                                  | `v1.19.1` ou `latest`                        |
 | **`INDEXATION_SUJET_API_HTTP_PORT`**         | Port d'écoute hôte exposé pour l'API FastAPI                                          | `8071`                                       |
+| **`INDEXATION_SUJET_API_ROOT_PATH`**         | Préfixe de chemin derrière le reverse proxy (pour `/docs` et `/openapi.json`)         | `/api/v1` (vide en local)                    |
 | **`INDEXATION_SUJET_VECTORISATION_PORT`**    | Port d'écoute hôte exposé pour le service de vectorisation                            | `8100`                                       |
 | **`INDEXATION_SUJET_QDRANT_PORT`**           | Port d'écoute hôte exposé pour la base Qdrant                                         | `6333`                                       |
 | **`INDEXATION_SUJET_LLM_PORT`**              | Port d'écoute hôte exposé pour le serveur LLM                                         | `11434`                                      |
